@@ -1,15 +1,12 @@
 .data
-	msg0: .asciiz "Dose ton proto arithmo: "
-	msg1: .asciiz "Dose ton deutero arithmo: "
+	msg0: .asciiz "Dose ton proto arithmo: " # Δήλωση του str1
+	msg1: .asciiz "Dose ton deutero arithmo: " # Δήλωση του str2
 	msg2: .asciiz "Apotelesma: "
 	var0: .word 10
 	var1: .word 5
 .text
 
 main:
-	lw $s0, var0         # Load register $s0 with the value of var0
-	lw $s1, var1         # Load register $s1 with the value of var1
-
 	# printf(msgt1)
 	la $a0,msg0
 	li $v0,4 	
@@ -20,7 +17,7 @@ main:
 	syscall
 	
 	# akiro sxolio s2 = v0 , v0 = 0
-	move $s0,$v0 
+	move $t0,$v0 
 	
 	# printf(msg2)
 	la $a0,msg1
@@ -32,10 +29,10 @@ main:
 	syscall
 	
 	# akiro sxolio s2 = v0 , v0 = 0
-	move $s1,$v0 
+	move $t1,$v0 
 	
 	# s0 = s0 - s1
-	sub $s0, $s0, $s1
+	sub $s0, $t0, $t1
 	
 	# printf(msg2)
 	la $a0,msg2
