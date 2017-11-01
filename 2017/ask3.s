@@ -11,6 +11,8 @@
 	msg2: .asciiz "Dose ton 2o arithmo: " # Δήλωση του msg1	 
 	
 	msg3: .asciiz "The Greatest Common Divisor is: "
+	
+	msg4: .asciiz "Both numbers are 0s!!! \n"
 
 	enter: .asciiz "\n" # Δήλωση του msg1
 
@@ -41,18 +43,28 @@ main:
         
         # if num0 && num1 == 0
         
-	jal euclid_loop # Κλήση της συνάρτησης 
-	
-	la $a0,msg3 # Αποθήκευση διεύθυνσης msg0 στον καταχωρητή $a0 
+        bne $t0, $t1, ELSE # cond1: branch if ! (num1  == num2 ) 
+        bne $t0, 0 , ELSE  
+        la $a0,msg4 # Αποθήκευση διεύθυνσης msg0 στον καταχωρητή $a0 
 	li $v0,4 # Κλήση για εκτέλεση εκτύπωσης string	
-	syscall # Εκτέλεση
+	syscall # Εκτέλεση 
+        
+        jal END
+        
+        ELSE:
+		jal euclid_loop # Κλήση της συνάρτησης 
 	
-	move $a0,$t0 # Αποθήκευση διεύθυνσης $t2 στον καταχωρητή $a0 
-	li $v0,1 # Κλήση για εκτέλεση εκτύπωσης ακεραίου
-	syscall # Εκτέλεση
+		la $a0,msg3 # Αποθήκευση διεύθυνσης msg0 στον καταχωρητή $a0 
+		li $v0,4 # Κλήση για εκτέλεση εκτύπωσης string	
+		syscall # Εκτέλεση
 	
-	li $v0,10 # Κλήση για έξοδο
-	syscall # Εκτέλεση
+		move $a0,$t0 # Αποθήκευση διεύθυνσης $t2 στον καταχωρητή $a0 
+		li $v0,1 # Κλήση για εκτέλεση εκτύπωσης ακεραίου
+		syscall # Εκτέλεση
+	
+	END:
+		li $v0,10 # Κλήση για έξοδο
+		syscall # Εκτέλεση
 	
 euclid_loop:
 
