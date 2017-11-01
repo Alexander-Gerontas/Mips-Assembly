@@ -48,8 +48,8 @@ fib_loop:
 	li $v0,4 # Κλήση για εκτέλεση εκτύπωσης string	
 	syscall # Εκτέλεση
 
-	add $t0,$t1,0 # $t0 = $t1 + 0 --> prev = next + 1
-	add $t1,$t2,0 # $t1 = $t2 + 0 --> next = result + 0
+	move $t0,$t1 # $t0 = $t1 --> prev = next 
+	move $t1,$t2 # $t1 = $t2 --> next = result
 	add $t2,$t0,$t1 # $t2 = $t0 + $t1 --> result = prev + next
 	add $t3,$t3,1 # $t3 = $t3 + 1 --> loop += 1
 	
