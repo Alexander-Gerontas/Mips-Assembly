@@ -1,58 +1,106 @@
-# Γέροντας Αλέξανδρος 321/2015029
+# 321/2015029
 
-# Δήλωση μεταβλητών
 .data 	
-	prev: .word 0 # Μεταβλητή για την αποθήκευση του fib_n
-	next: .word 1 # Μεταβλητή για την αποθήκευση του fib_n+1
-	result: .word 0	# Μεταβλητή για την Aποθήκευση τελικού αποτελέσματος 
 	loop: .word 0 # H μεταβλητή loop είναι ο μετρητής επαναλήψεων του βρόνχου
-	
-	space: .asciiz " " # Δήλωση μηνυμάτων
-	msg0: .asciiz "Dose to plithos ton oron pou theleis na tipothoun: "
-	msg1: .asciiz "Apotelesma: " 		 
 
-# Το πρόγραμμα τοποθετείται κάτω απο το .text
+	space: .asciiz "\n\n" # enter
+
+	msg0: .asciiz "Calculation of the Greatest Common Divis or of two integers using Euclid's algorithm \n"
+	msg1: .asciiz "Dose ton 1o arithmo: " 
+	msg2: .asciiz "Dose ton 2o arithmo: " 
+	msg3: .asciiz "The Greatest Common Divisor is: "
+	msg4: .asciiz "Both numbers are 0s!!! \n"
+
 .text
+	main:     
+		lw $t3, loop
+	          
+        	la $a0,msg0  # tiposi arxikou minimatos
+		li $v0,4
+		syscall 
+	
+	program_loop:
+				
+		jal give_numbers
+				
+		#jal zero_func_t0
+		jal euclid_loop
+		jal print_result
+		add $t3,$t3,1 # loop += 1
+		
+		beq $t3,1,program_loop 
 
-# Κυρίως πρόγραμμα 
-main: 
-	lw $t0, prev # Φόρτωση τιμών των μεταβλητών στους καταχωρητές $t0,$t1,$t2 και $t3. 
-	lw $t1, next
-        lw $t2, result
-        lw $t3, loop
-                
-        la $a0,msg0 # Αποθήκευση διεύθυνσης msg0 στον καταχωρητή $a0 
-	li $v0,4 # Κλήση για εκτέλεση εκτύπωσης string	
-	syscall # Εκτέλεση
-        
-        li $v0,5 # Κλήση για διάβασμα ακεραίου  
-	syscall # Εκτέλεση
-	move $t4,$v0 # Αποθήκευση της τιμής στον καταχωρητή $t4
-        
-        la $a0,msg1 # Αποθήκευση διεύθυνσης msg1 στον καταχωρητή $a0 
-	li $v0,4 # Κλήση για εκτέλεση εκτύπωσης string
-	syscall # Εκτέλεση
-        
-	jal fib_loop # Κλήση της συνάρτησης fib_loop
+		jal exit
 	
-	li $v0,10 # Κλήση για έξοδο
-	syscall # Εκτέλεση
+	# eleγχει περιπτωσεις οπως αν και οι 2 αριθμοι ειναι 0 η μονο ο ενας
+	zero_func_t0:
+		bnez $t0, zero_func_t1 # cond1: branch if ! (num1 != 0) 
+	        beqz $t1, print_both_numbers_0        
+	         		
+		#jal exit
+		
+		add $t0,$t1,0 # patenta
+		jal print_result
+		
+		jal exit
+		
+		jal print_result
+	        
+        
+        	#la $a0,msg4 
+		#li $v0,4 
+		#syscall 
+		
+	give_numbers:
+		la $a0,msg1  # ζηταμε απο τον χρηστη 1 αριθμο
+		li $v0,4
+		syscall
+		
+		li $v0,5   
+		syscall 
+		move $t0,$v0 
+		
+		la $a0,msg2  #ζηταμε απο τον χρηστη τον 2ο αριθμο
+		li $v0,4
+		syscall
+		
+		li $v0,5  # μεταφορα ακεραιου στον $t1 
+		syscall 
+		move $t1,$v0 
+	
+		
+	zero_func_t1:
+		jr $ra 
+	
+	print_both_numbers_0:
+		la $a0,msg0  # both numbers are 0
+		li $v0,4
+		syscall
+		
+	euclid_loop:		
+		div $t0, $t1
+		add $t0,$t1,0 # patenta
+		mfhi $t1
 
-# Συνάρτηση για τον υπολογισμό της ακολουθίας Fibonacci		
-fib_loop:
-	move $a0,$t2 # Αποθήκευση διεύθυνσης $t2 στον καταχωρητή $a0 
-	li $v0,1 # Κλήση για εκτέλεση εκτύπωσης ακεραίου
-	syscall # Εκτέλεση
+		bne $t1,0,euclid_loop
 	
-	la $a0,space # Αποθήκευση διεύθυνσης space στον καταχωρητή $a0 
-	li $v0,4 # Κλήση για εκτέλεση εκτύπωσης string	
-	syscall # Εκτέλεση
-
-	move $t0,$t1 # $t0 = $t1 --> prev = next 
-	move $t1,$t2 # $t1 = $t2 --> next = result
-	add $t2,$t0,$t1 # $t2 = $t0 + $t1 --> result = prev + next
-	add $t3,$t3,1 # $t3 = $t3 + 1 --> loop += 1
+		jr $ra 
+		
+	print_result:
+		la $a0,msg3 # τυπωση msg3 
+		li $v0,4 
+		syscall 		
+		
+		move $a0,$t0 # τυπωση αποτελεσματος
+		li $v0,1
+		syscall
+		
+		la $a0,space
+		li $v0,4 
+		syscall 
+		
+		jr $ra 
 	
-	blt $t3,$t4,fib_loop # go to fib_loop if $t3 > $t4
-	
-	jr $ra # Έξοδος από την συνάρτηση και επιστροφή στον καταχωρητή $ra
+	exit:
+		li $v0,10 
+		syscall 
