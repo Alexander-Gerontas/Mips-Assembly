@@ -44,13 +44,17 @@
         	sub $t0, $zero, $t0
         	
         zero_func:
-        	bne $t0, $t1, return # cond1: branch if ! (num1  == num2 ) 
-        	bne $t0, 0 , return
-        	la $a0,msg4 
-		li $v0,4 
-		syscall 
+        	bnez $t0, return # cond1: branch if ! (num1 != 0) 
+        	beqz $t1, return
+        	
+        	
+        	
+        	
+        	#la $a0,msg4 
+		#li $v0,4 
+		#syscall 
 		
-		jal END
+		#jal END
 	
 	return : 
 		jr $ra # επιστροφη στη Main
