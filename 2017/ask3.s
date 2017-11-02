@@ -14,16 +14,15 @@
 	
 	msg4: .asciiz "Both numbers are 0s!!! \n"
 
-	enter: .asciiz "\n" # ?????? ??? msg1
-
+	enter: .asciiz "\n" 
 
 .text
 	main:          
-        	la $a0,msg0 
+        	la $a0,msg0  # tiposi arxikou minimatos
 		li $v0,4
 		syscall 
 	
-		la $a0,msg1 
+		la $a0,msg1 # ζηταμε απο τον χρηστη 1 αριθμο
 		li $v0,4 
 		syscall 
         
@@ -31,7 +30,7 @@
 		syscall 
 		move $t0,$v0 
 	
-		la $a0,msg1 
+		la $a0,msg2 #ζηταμε απο τον χρηστη τον 2ο αριθμο
 		li $v0,4 
 		syscall 
         
@@ -39,19 +38,22 @@
 		syscall 
 		move $t1,$v0 
                
-                jal zero_func
+                jal zero_func # ελεγχος αν και οι 2 αριθμοι ειναι 0
         
-        	blt $t0, $zero, negative_func
+        	bltz $t0, negative_func
         	sub $t0, $zero, $t0
         	
         zero_func:
-        	bne $t0, $t1, negative_func # cond1: branch if ! (num1  == num2 ) 
-        	bne $t0, 0 , negative_func  
+        	bne $t0, $t1, return # cond1: branch if ! (num1  == num2 ) 
+        	bne $t0, 0 , return
         	la $a0,msg4 
 		li $v0,4 
 		syscall 
 		
 		jal END
+	
+	return : 
+		jr $ra # επιστροφη στη Main
         
 	negative_func:
 		bgt $t1, $zero , ELSE 
@@ -75,7 +77,7 @@
 	euclid_loop:
 		
 		div $t0, $t1
-		add $t0,$t1,0		
+		add $t0,$t1,0 # patenta
 		mfhi $t1
 
 		bne $t1,0,euclid_loop
