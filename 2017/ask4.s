@@ -1,8 +1,10 @@
-﻿
 .data
 
+	#array: .space 80
+	
 	array: .word 0:20
-	i: .word 1	
+	
+	#i: .word 1	
 	
 	space: .asciiz " " # enter
 	
@@ -11,12 +13,7 @@
 
 .text
 
-main:
-
-	lw $t3, i
-	
-	add $t3, $zero , $zero
-	
+main:	
 	la $a0,msg0 # Αποθήκευση διεύθυνσης msg0 στον καταχωρητή $a0 
 	li $v0,4 # Κλήση για εκτέλεση εκτύπωσης string	
 	syscall # Εκτέλεση
@@ -32,73 +29,50 @@ main:
 	li $v0,5 # Κλήση για διάβασμα ακεραίου  
 	syscall # Εκτέλεση
 	move $t1,$v0 # Αποθήκευση της τιμής στον καταχωρητή 
+		
+	add $t3, $zero , $zero
+	
+	jal loop
 	
 	la $t2, array 
-	sw $t1, ($t2)
 	
-	jal loop_
+	add $t3, $zero , $zero
+	add $t2, $0 , $0
+	
+	jal print	
 		
-	add $t3, $0, $0 # i =0;
-#	jal print
-	
 	jal end
+	 
+loop :
+	la $t2, array($t3)
 	
-end:
-		li $v0,10 # Κλήση για έξοδο
-		syscall # Εκτέλεση
+	sw $t0, ($t2)
 		
-loop_:
-	add $t0, $t0, $t1 
+	add $t0,$t0,$t1
+	add $t3,$t3,4
 	
-	add $t3, $t3, 4  # i = i + 4
-	
-	add $t2, $t2, $t3
-	
-	sw $t0, ($t2)
-	
-	blt $t3,76,loop
+	blt $t3, 80, loop 
 	
 	jr $ra
-	
-loop:
-	add $t0, $t0, $t1 
-	
-	add $t3, $t3, 4  # i = i + 4
-	
-	add $t2, $t2, $t3
-	
-	sw $t0, ($t2)
-	
-	blt $t3,76,loop
-	
-	jr $ra
-	
-print :
-	la $t2, array + 0($t3)
-	
-#	add $t2, $t2, $t3
+	 
+print :		
+	lw $t2, array($t3)
 	
 	move $a0,$t2 # τυπωση αποτελεσματος
 	li $v0,1
 	syscall
-	
+
 	la $a0,space
 	li $v0,4 # Κλήση για εκτέλεση εκτύπωσης string	
 	syscall # Εκτέλεση
 	
-	add $t3, $t3, 4
+	add $t3, $t3, 4 # i = i + 4
 	
-	blt $t3,76,loop
+	blt $t3,80,print
 	
 	jr $ra
 	
- # Γέροντας Αλέξανδρος 321/2015029
-
-# kalitera na apothikeusoume apetheias mesa ston pinaka
-# to $t3 midenizetai me patenta
-# to i einai axristo
-
-t0 : o arithmos pou dinei o xristis
-t1 : to bima tis proodou
-t2 : apothikeueai i dieuthinsi mias seiras tou pinaka
-t3 : (i) to keli tou pinaka pou theloume
+end:
+	li $v0,10 # Κλήση για έξοδο
+	syscall # Εκτέλεση
+	
