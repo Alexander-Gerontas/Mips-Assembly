@@ -11,8 +11,10 @@
 .data	
 	array: .word 0:10
 	
-	space: .asciiz " " # enter
+	space: .asciiz " " 
 	enter: .asciiz " \n" # enter
+	
+	troll: .asciiz "end loop \n" # debugger
 	
 	msg2: .asciiz "Unsorted array: " 
 
@@ -23,58 +25,70 @@
 		li $v0,4 
 		syscall 
 		
-		add $t9, $zero, 100
-		add $t3, $zero, 0
+		add $t9, $0, 100
+		add $t3, $0, 0
 		
 		jal fill # gemisma pinaka me dikes mas times
 		
 		add $t3,$0, 0		
 		jal print # tiposi ataksinomitou pinaka
-		
-		#la $t2, array($t3)
-			
+					
 		add $t4,$0, 36	# n = 36
-		jal sort
+		j sort	
 		
-	continue:
-		
-		add $t3,$0, 0		
-		jal print # tiposi ataksinomitou pinaka
-		
-		jal end
-	
 	sort:
-		beq $t4,4,return ## if (n == 1) return;
+		beq $t4,0,return ## if (n == 1) return;
 		
 		add $t3,$0, 0
 		jal loop
 		
+		add $t6,$t3, 0
+		add $t3,$0, 0
+		jal print
+		add $t3,$t6, 0
+		
 		add $t4, $t4, -4
 		jal sort # bubbleSort(arr, n-4);
+		
+		
 			
 		jal continue
 
 	loop:	
         	lw $t2, array($t3)
-        	
+        	        	        	
         	add $t3, $t3, 4 # t3 = t3 + 4        	
-        	lw $t5, array($t3)        	
+        	lw $t5, array($t3)         	       	
 		add $t3, $t3, -4
         	
         	bgt $t2,$t5, swap #if (arr[i] > arr[i+1])
-        	        	       	
-        	add $t3, $t3, 4       	
-        	        	
-        	blt $t3,$t4, loop # isos na prepei na ginei t4 - 1
         	
-        	jr $ra
+        	loop_continue:       	
+	        	          	
+	        	move $a0,$t3
+			li $v0,1
+			#syscall
+		
+			la $a0,space
+			li $v0,4
+			#syscall    
+			
+		   	add $t3, $t3, 4   	
+        	     	        	        	
+	        	blt $t3,$t4, loop # isos na prepei na ginei t4 - 1
+        	
+        		la $a0,troll
+			li $v0,4
+			#syscall
+        	       	
+        		jr $ra
             	
         swap:                
         	move $t6, $t2
         	sw $t5, array + 0($t3)
         	sw $t6, array + 4($t3)     
-        	
-        	 jr $ra 	  	
+        	 
+        	j loop_continue       	        			
         	            	
         return:
         	jr $ra		
@@ -118,3 +132,10 @@
 	end:
 		li $v0,10 
 		syscall 
+		
+	continue:
+		
+		add $t3,$0, 0		
+		jal print # tiposi ataksinomitou pinaka
+		
+		jal end
