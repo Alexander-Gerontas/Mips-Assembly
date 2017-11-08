@@ -2,16 +2,12 @@
 
 .data 	
 
-	#loop: .word 0 # H μεταβλητή loop είναι ο μετρητής επαναλήψεων του βρόνχου
-
 	enter: .asciiz "\n\n" # enter
-
 	msg0: .asciiz "Calculation of the Greatest Common Divis or of two integers using Euclid's algorithm \n"
 	msg1: .asciiz "Dose ton 1o arithmo: " 
 	msg2: .asciiz "Dose ton 2o arithmo: " 
 	msg3: .asciiz "The Greatest Common Divisor is: "
 	msg4: .asciiz "Both numbers are 0s!!! \n"
-
 
 .text
 	main:
@@ -19,7 +15,7 @@
 		li $v0,4
 		syscall 
 		
-		add $t2, $0, 0
+		move $t2,$0 # H μεταβλητή loop είναι ο μετρητής επαναλήψεων του βρόνχου
 		j loop
 	
 	loop:		
@@ -28,28 +24,25 @@
 		
 		jal give_numbers
 				
-#		jal check_if_zero 
 		jal check_if_negative
 		jal check_all
 		
 		jal euclid_loop
 		
-		jal print_result
+		jal print_result	
 		
-		j loop # to print kalei to loop opote afto dn xreiazetai
-
 	check_if_negative:
 		bgez $t0,check_if_t1_negative
+						
 		sub $t0, $0, $t0
 		
-		j check_if_t1_negative
-		
+		j check_if_t1_negative		
 		
 	check_if_t1_negative:
 		bgez $t1,return
-		sub $t1,$0, $t1
+		sub $t1, $0, $t1
 		
-		j return 
+		jr $ra
 
 	check_all:
 		bnez $t0,else # if num0 != 0
@@ -63,27 +56,23 @@
 		j loop
 			
 	else:
-		bnez $t1,return
-		move $t4,$t0
+		bnez $t1, return
 		j print_result
 		
 	else_2:
-		move $t4,$t1
-		j print_result
-				
+		move $t0,$t1
+		j print_result				
 		
 	return: 
 		jr $ra		
 		
 	euclid_loop:		
 		div $t0, $t1
-		add $t0,$t1,0 # patenta
+		move $t0,$t1
 		mfhi $t1
 				
-		bne $t1,0,euclid_loop
-		
-		move $t4, $t0
-	
+		bne $t1,0,euclid_loop	
+			
 		jr $ra 
 		
 	print_result:
@@ -91,7 +80,7 @@
 		li $v0,4 
 		syscall 		
 		
-		move $a0,$t4 # τυπωση αποτελεσματος
+		move $a0,$t0 # τυπωση αποτελεσματος
 		li $v0,1
 		syscall
 		
