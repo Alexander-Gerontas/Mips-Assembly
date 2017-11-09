@@ -10,59 +10,77 @@
 	msg4: .asciiz "Both numbers are 0s!!! \n"
 
 .text
+	# Κυρίως πρόγραμμα 
 	main:
-		la $a0,msg0  # tiposi arxikou minimatos
-		li $v0,4
-		syscall 
+		la $a0,msg0 # Αποθήκευση διεύθυνσης msg0 στον καταχωρητή $a0 
+		li $v0,4    # Κλήση για εκτέλεση εκτύπωσης string	
+		syscall     # Εκτέλεση
 		
 		move $t2,$0 # H μεταβλητή loop είναι ο μετρητής επαναλήψεων του βρόνχου
-		j loop
+		j loop # Μεταφέρουμε την εκτέλεση στη συνάρτηση loop χωρίς να αποθηκεύσουμε τον μετρητή του προγράμματος
+	
 	
 	loop:		
 		add $t2, $t2, 1
 		beq $t2,3,exit
 		
 		jal give_numbers
-				
-		jal check_if_negative
+						
+		bltz $t0,check_if_t0_negative
+		bltz $t1,check_if_t1_negative
+		
 		jal check_all
 		
 		jal euclid_loop
 		
 		jal print_result	
 		
-	check_if_negative:
-		bgez $t0,check_if_t1_negative
-						
-		sub $t0, $0, $t0
+	give_numbers: 
+		# Τυπώνουμε μήνυμα στον χρήστη για να εισάγει τον 1ο αριθμό
+		la $a0,msg1 # Αποθήκευση διεύθυνσης msg0 στον καταχωρητή $a0
+		li $v0,4
+		syscall # Εκτέλεση
 		
-		j check_if_t1_negative		
+		li $v0,5   
+		syscall # Εκτέλεση
+		move $t0,$v0 
 		
-	check_if_t1_negative:
-		bgez $t1,return
-		sub $t1, $0, $t1
+		la $a0,msg2  #ζηταμε απο τον χρηστη τον 2ο αριθμο
+		li $v0,4
+		syscall # Εκτέλεση
 		
+		li $v0,5  # μεταφορα ακεραιου στον $t1 
+		syscall 
+		move $t1,$v0 
+		
+		jr $ra 	
+		
+	check_if_t0_negative:						
+		sub $t0, $0, $t0 # 
+		jr $ra # Έξοδος από την συνάρτηση και επιστροφή στον καταχωρητή $ra
+				
+	check_if_t1_negative:		
+		sub $t1, $0, $t1		
 		jr $ra
 
-	check_all:
-		bnez $t0,else # if num0 != 0
-			
-		bnez $t1,else_2 # if num1 != 0
+	check_all: # αλλαγη ονοματος
+		bnez $t0,if_t0_not_zero # if num0 != 0			
+		bnez $t1,if_t1_not_zero # if num1 != 0
 		
 		la $a0,msg4 # τυπωση msg4
 		li $v0,4 
-		syscall 
+		syscall # Εκτέλεση
 		
 		j loop
 			
-	else:
+	if_t0_not_zero:
 		bnez $t1, return
 		j print_result
 		
-	else_2:
+	if_t1_not_zero:
 		move $t0,$t1
-		j print_result				
-		
+		j print_result
+				
 	return: 
 		jr $ra		
 		
@@ -90,25 +108,8 @@
 		
 		j loop
 		
-	give_numbers: 
-		la $a0,msg1  # ζηταμε απο τον χρηστη 1 αριθμο
-		li $v0,4
-		syscall
-		
-		li $v0,5   
-		syscall 
-		move $t0,$v0 
-		
-		la $a0,msg2  #ζηταμε απο τον χρηστη τον 2ο αριθμο
-		li $v0,4
-		syscall
-		
-		li $v0,5  # μεταφορα ακεραιου στον $t1 
-		syscall 
-		move $t1,$v0 
-		
-		jr $ra 	
+	
 	
 	exit:
-		li $v0,10 
-		syscall 
+		li $v0,10 # Κλήση για έξοδο
+		syscall # Εκτέλεση
