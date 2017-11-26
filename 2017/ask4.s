@@ -20,7 +20,7 @@ main:
 	
 	li $v0,5     # Κλήση για διάβασμα ακεραίου  
 	syscall      # Εκτέλεση
-	move $t0,$v0 # Αποθήκευση της τιμής στον καταχωρητή 
+	move $s0,$v0 # Αποθήκευση της τιμής στον καταχωρητή 
 	
 	la $a0,msg1  # Αποθήκευση διεύθυνσης msg1 στον καταχωρητή $a0 
 	li $v0,4     # Κλήση για εκτέλεση εκτύπωσης string	
@@ -28,43 +28,41 @@ main:
 	
 	li $v0,5     # Κλήση για διάβασμα ακεραίου  
 	syscall      # Εκτέλεση
-	move $t1,$v0 # Αποθήκευση της τιμής στον καταχωρητή 
+	move $s1,$v0 # Αποθήκευση της τιμής στον καταχωρητή 
 		
-	li $s0, 0
-	li $s1, 0 
+	li $s2, 0    # O $s2 ειναι ο μετρητης της επαναληψης o οποιος χρησιμοποιειται και για την διασχηση του πινακα
+	li $s3, 0    # Ο καταχωρητης $s3 χρησιμοποιειται gia to υπολογισμο του Άθροισμα όρων ακολουθίας
 	
-	jal loop         # gemisma pinaka
+	jal Array_Loop         # Άλμα στην συνάρτηση Array_Loop
 	
-	sw $s1, arraySum # Αποθήκευση τιμής του καταχωρητή $s1 στην μεταβλητή arraySum
+	sw $s3, arraySum # Αποθήκευση τιμής του καταχωρητή $s3 στην μεταβλητή arraySum
 	
 	la $t2, array 
+
+	li $s2, 76	
 	
-	li $s0, 76	
-	
-	jal print_R	
-	
-	li $s0, 0
+	jal print_R	# Άλμα στην συνάρτηση Array_Loop
 			
-	jal end
+	jal end      # Άλμα στην συνάρτηση end
 	 
-loop :
-	la $t2, array($s0)
+Array_Loop :
+	la $t0, array($s2)
 
-	sw $t0, ($t2)
+	sw $s0, ($t0)
 		
-	add $s1, $s1, $t0	
+	add $s3, $s3, $s0	
 		
-	add $t0,$t0,$t1
-	add $s0,$s0,4
+	add $s0, $s0, $s1
+	addi $s2, $s2, 4
 
-	blt $s0, 80, loop 
+	blt $s2, 80, Array_Loop 
 		
 	jr $ra
 	
 print_R :		
-	lw $t2, array($s0)
+	lw $t0, array($s2)
 	
-	move $a0,$t2 # τυπωση αποτελεσματος
+	move $a0,$t0 # τυπωση αποτελεσματος
 	li $v0,1
 	syscall
 
@@ -72,9 +70,9 @@ print_R :
 	li $v0,4     # Κλήση για εκτέλεση εκτύπωσης string	
 	syscall      # Εκτέλεση
 	
-	add $s0, $s0, -4 # i = i - 4
+	addi $s2, $s2, -4 # i = i - 4
 	
-	bgez $s0, print_R
+	bgez $s2, print_R
 	
 	la $a0,msg2 # Αποθήκευση διεύθυνσης msg2 στον καταχωρητή $a0 
 	li $v0,4    # Κλήση για εκτέλεση εκτύπωσης string	
@@ -88,5 +86,5 @@ print_R :
 		
 end:
 	li $v0,10 # Κλήση για έξοδο
-	syscall # Εκτέλεση
+	syscall   # Εκτέλεση
 	
