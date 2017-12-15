@@ -15,10 +15,11 @@
 	
 .text
 	
+	# Κυρίως πρόγραμμα
 	main:	
-		la $a0,msg0
-		li $v0,4 
-		syscall 
+		la $a0, msg0  # Αποθήκευση διεύθυνσης msg0 στον καταχωρητή $a0 
+		li $v0, 4     # Κλήση για εκτέλεση εκτύπωσης string	
+		syscall       # Εκτέλεση
 		
 		li $t9, 100
 		li $s1, 0
@@ -33,16 +34,43 @@
 		
 		continue:
 		
-			li $s1, 0		
+			li $s1, 0   # $s1 = 0
 			
 			la $a0,msg1 # Αποθήκευση διεύθυνσης msg1 στον καταχωρητή $a0 
 			li $v0,4    # Κλήση για εκτέλεση εκτύπωσης string	
-			syscall     # Εκτέλεση		
-			
-			jal print # tiposi ataksinomitou pinaka
+			syscall     # Εκτέλεση				
+									
+			jal print   # Τύπωση ταξινομημένου πίνακα
 			
 			li $v0, 10  # Κλήση για έξοδο
 			syscall     # Εκτέλεση
+		
+		fill2:
+			la $s2, array($s1)
+			
+			la $a0, msg3  # Αποθήκευση διεύθυνσης msg3 στον καταχωρητή $a0 
+			li $v0, 4     # Κλήση για εκτέλεση εκτύπωσης string	
+			syscall       # Εκτέλεση
+			
+			move $a0, $s0 # Αποθήκευση της τιμής του καταχωρητή $s0 στον καταχωρητή $a0 
+			li $v0, 1     # Κλήση για εκτέλεση εκτύπωσης ακεραίου
+			syscall       # Εκτέλεση
+			
+			la $a0, msg4 # Αποθήκευση διεύθυνσης msg4 στον καταχωρητή $a0 
+			li $v0, 4    # Κλήση για εκτέλεση εκτύπωσης string	
+			syscall      # Εκτέλεση
+			
+			li $v0,5         # Κλήση για διάβασμα ακεραίου  
+			syscall          # Εκτέλεση	
+			sw $v0, ($s2)
+				
+			add $s1, $s1, 4 # $s1 = $s1 + 4
+			add $s0, $s0, 1 # $s0 = $s0 + 1
+		
+			blt $s1, 40, fill2 # if $s1 < 40 goto fil2
+					
+			jr $ra
+		
 		
 	sort:
 		beq $s2,4,return ## if (n == 1) return;
@@ -89,23 +117,22 @@
 		
 	print:
 	
-		lw $s3, array($s1)
+		lw $s3, array($s1) # Αποθήκευση της τιμής του πίνακα στη θέση $s1 στον καταχωρητή $s3
 	
-		move $a0,$s3 
-		li $v0,1
-		syscall
+		move $a0,$s3  # Αποθήκευση της τιμής του καταχωρητή $s3 στον καταχωρητή $a0 
+		li $v0, 1     # Κλήση για εκτέλεση εκτύπωσης ακεραίου
+		syscall       # Εκτέλεση
 
-		la $a0,space
-		li $v0,4 
-		syscall 
+		la $a0, space # Αποθήκευση διεύθυνσης space στον καταχωρητή $a0
+		li $v0, 4     # Κλήση για εκτέλεση εκτύπωσης string
+		syscall       # Εκτέλεση
 	
-		add $s1, $s1, 4
-	
-		blt $s1, 40, print
+		add $s1, $s1, 4	   # $s1 = s1 + 4
+		blt $s1, 40, print # if $s1 < 40 goto print
 		
-		la $a0,enter
-		li $v0,4 
-		syscall 
+		la $a0, enter # Αποθήκευση διεύθυνσης enter στον καταχωρητή $a0
+		li $v0, 4     # Κλήση για εκτέλεση εκτύπωσης string	
+		syscall       # Εκτέλεση
 	
 		jr $ra
 	
