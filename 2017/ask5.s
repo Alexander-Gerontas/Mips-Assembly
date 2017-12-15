@@ -73,29 +73,25 @@
 		
 		
 	sort:
-		beq $s2,4,return ## if (n == 1) return;
+		beq $s2, 4, continue  # if ($s2 == 4) return;
 		
-		li $s1, 0
+		li $s1, 0 # $s1 = 0
 		jal BubbleSortLoop
+				
+		move $t6, $s1
 		
-		add $t6,$s1, 0
-		add $s1,$0, 0
-		#jal print
-		add $s1,$t6, 0
-		
-		add $s2, $s2, -4
+		sub $s2, $s2, 4
 		jal sort # bubbleSort(arr, n-4);	
 					
 		jal continue
 
+	# bubble sort BubbleSortLoop
 	BubbleSortLoop:			
 		beq $s1,$s2, return # isos na prepei na ginei s2 - 1
 	
-        	lw $s3, array($s1)
-        	        	        	
-#        	add $s1, $s1, 4 # s1 = s1 + 4        	
-        	lw $s4, array + 4($s1)         	       	
-#		add $s1, $s1, -4
+        	lw $s3, array($s1)      # Αποθήκευση της τιμής του πίνακα στη θέση $s1 στον καταχωρητή $s3   	        	        	  	
+        	lw $s4, array + 4($s1)   # Αποθήκευση της τιμής του πίνακα στη θέση $s1 + 4 στον καταχωρητή $s4
+
         	
         	bgt $s3,$s4, swap #if (arr[i] > arr[i+1])
         	
@@ -113,8 +109,9 @@
         	j loop_continue       	        			
         	            	
         return:
-        	jr $ra		
-		
+        	jr $ra # Έξοδος από την συνάρτηση και άλμα στον καταχωρητή $ra	
+	
+	# Εκτυπώνει τους όρους του πίνακα στη σειρά 		
 	print:
 	
 		lw $s3, array($s1) # Αποθήκευση της τιμής του πίνακα στη θέση $s1 στον καταχωρητή $s3
@@ -134,13 +131,13 @@
 		li $v0, 4     # Κλήση για εκτέλεση εκτύπωσης string	
 		syscall       # Εκτέλεση
 	
-		jr $ra
+		jr $ra        # Έξοδος από την συνάρτηση και άλμα στον καταχωρητή $ra
 	
 		
 	
 
 
-
+# γεμισμα του πινακα με δικες μου τιμες						
 fill:
 
 		la $s3, array($s1)
