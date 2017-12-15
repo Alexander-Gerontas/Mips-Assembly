@@ -4,38 +4,37 @@
 
 .data	
 	array: .word 0:10 # Δεσμεύει έναν πίνακα 10 ακεραίων, όπου όλοι είναι αρχικοποιημένοι στο 0
-	#ArraySize: .word 40
-	
+		
 	space: .asciiz " " 
 	enter: .asciiz "\n" 
 	
 	msg0: .asciiz "Unsorted array: " 
 	msg1: .asciiz "Sorted array: " 
-	msg3: .asciiz  "Dose ton "
-	msg4: .asciiz  "o arithmo: "
+	msg2: .asciiz  "Dose ton "
+	msg3: .asciiz  "o arithmo: "
 	
-.text
-	
+.text	
 	# Κυρίως πρόγραμμα
-	main:	
+	Main:	
 		li $t9, 100
 		li $s0, 1	# $s0 = 1
 		li $s1, 0       # $s1 = 0
 		
-		jal fill2 #  Άλμα στην συνάρτηση fill2
-		
+		#jal GetNumbers     #  Άλμα στην συνάρτηση GetNumbers
+		jal fill
+				
 		la $a0, msg0  # Αποθήκευση διεύθυνσης msg0 στον καταχωρητή $a0 
 		li $v0, 4     # Κλήση για εκτέλεση εκτύπωσης string	
 		syscall       # Εκτέλεση
 		
-		li $s1, 0		
-		jal print # tiposi ataksinomitou pinaka
+		li $s1, 0     # $s1 = 0
+		jal Print     # Τύπωση μη ταξινομημένου πίνακα
 					
-		#li $s2, ArraySize # $s2 = ArraySize
-		li $s2, 40	
-		jal sort	
+		li $s2, 40    # $s2 = 0
+		jal BubbleSort      # Ταξινόμηση πίνακα
 		
-		continue:
+		# 
+		Main_Continue:
 		
 			li $s1, 0   # $s1 = 0
 			
@@ -43,15 +42,16 @@
 			li $v0,4    # Κλήση για εκτέλεση εκτύπωσης string	
 			syscall     # Εκτέλεση				
 									
-			jal print   # Τύπωση ταξινομημένου πίνακα
+			jal Print   # Τύπωση ταξινομημένου πίνακα
 			
 			li $v0, 10  # Κλήση για έξοδο
 			syscall     # Εκτέλεση
 		
-		fill2:
-			la $s2, array($s1)
+		# Είσοδος αριθμών από τον χρήστη
+		GetNumbers:
+			la $s2, array($s1) 
 			
-			la $a0, msg3  # Αποθήκευση διεύθυνσης msg3 στον καταχωρητή $a0 
+			la $a0, msg2  # Αποθήκευση διεύθυνσης msg2 στον καταχωρητή $a0 
 			li $v0, 4     # Κλήση για εκτέλεση εκτύπωσης string	
 			syscall       # Εκτέλεση
 			
@@ -59,7 +59,7 @@
 			li $v0, 1     # Κλήση για εκτέλεση εκτύπωσης ακεραίου
 			syscall       # Εκτέλεση
 			
-			la $a0, msg4 # Αποθήκευση διεύθυνσης msg4 στον καταχωρητή $a0 
+			la $a0, msg3 # Αποθήκευση διεύθυνσης msg3 στον καταχωρητή $a0 
 			li $v0, 4    # Κλήση για εκτέλεση εκτύπωσης string	
 			syscall      # Εκτέλεση
 			
@@ -70,55 +70,56 @@
 			add $s1, $s1, 4 # $s1 = $s1 + 4
 			add $s0, $s0, 1 # $s0 = $s0 + 1
 		
-			blt $s1, 40, fill2 # if $s1 < 40 goto fil2
+			blt $s1, 40, GetNumbers # if $s1 < 40 goto fil2
 					
 			jr $ra
 		
 		
-	sort:
-		beq $s2, 4, continue  # if ($s2 == 4) return;
+	BubbleSort:
+		beq $s2, 4, Main_Continue  # if ($s2 == 4) Return;
 		
 		li $s1, 0 # $s1 = 0
 		jal BubbleSortLoop
-				
-		move $t6, $s1		
+					
 		sub $s2, $s2, 4
 		
-		j sort # bubbleSort(arr, n-4);	
+		j BubbleSort # bubbleSort(arr, n-4);	
 					
-		jal continue
+		jal Main_Continue # Άλμα στην συνάρτηση BubbleSortLoop
 
-	# bubble sort BubbleSortLoop
+	# bubble BubbleSort BubbleSortLoop
 	BubbleSortLoop:			
-		beq $s1,$s2, return # isos na prepei na ginei s2 - 1
+		beq $s1,$s2, Return # isos na prepei na ginei s2 - 1
 	
-        	lw $s3, array($s1)      # Αποθήκευση της τιμής του πίνακα στη θέση $s1 στον καταχωρητή $s3   	        	        	  	
+        	lw $s3, array($s1)       # Αποθήκευση της τιμής του πίνακα στη θέση $s1 στον καταχωρητή $s3   	        	        	  	
         	lw $s4, array + 4($s1)   # Αποθήκευση της τιμής του πίνακα στη θέση $s1 + 4 στον καταχωρητή $s4
 
-        	bgt $s3,$s4, swap #if (arr[i] > arr[i+1])
+        	bgt $s3,$s4, Swap #if ( array[$s1] > array[$s1+4] ) goto Swap
         	
-        	loop_continue:       		        	          	            
+        	# Επιστροφή στη συνάρτηση μετά την κλήση της Swap
+        	BubbleSortLoop_Continue:       		        	          	            
 			
 		   	add $s1, $s1, 4  # s1 = s1 + 4 	
         	
-        		j BubbleSortLoop
+        		j BubbleSortLoop # Άλμα στην συνάρτηση BubbleSortLoop
             
  	# Ανταλλαγή θέσεων μεταξύ στοιχείων του πίνακα	
-        swap:                
-        	sw $s4, array + 0($s1)
-        	sw $s3, array + 4($s1)     
+        Swap:                
+     	        sw $s3, array + 4($s1)    # $s3 = array[s1 + 4]    
+        	sw $s4, array + 0($s1)    # $s4 = array[s1]
         	 
-        	j loop_continue       	        			
-        	            	
-        return:
+        	j BubbleSortLoop_Continue # Άλμα στην συνάρτηση BubbleSortLoop_Continue  	        			
+        	
+        # Εκτέλεση εντολής jr $ra        	
+        Return:
         	jr $ra # Έξοδος από την συνάρτηση και άλμα στον καταχωρητή $ra	
 	
 	# Εκτυπώνει τους όρους του πίνακα στη σειρά 		
-	print:
+	Print:
 	
 		lw $s3, array($s1) # Αποθήκευση της τιμής του πίνακα στη θέση $s1 στον καταχωρητή $s3
 	
-		move $a0,$s3  # Αποθήκευση της τιμής του καταχωρητή $s3 στον καταχωρητή $a0 
+		move $a0, $s3  # Αποθήκευση της τιμής του καταχωρητή $s3 στον καταχωρητή $a0 
 		li $v0, 1     # Κλήση για εκτέλεση εκτύπωσης ακεραίου
 		syscall       # Εκτέλεση
 
@@ -127,7 +128,7 @@
 		syscall       # Εκτέλεση
 	
 		add $s1, $s1, 4	   # $s1 = s1 + 4
-		blt $s1, 40, print # if $s1 < 40 goto print
+		blt $s1, 40, Print # if $s1 < 40 goto Print
 		
 		la $a0, enter # Αποθήκευση διεύθυνσης enter στον καταχωρητή $a0
 		li $v0, 4     # Κλήση για εκτέλεση εκτύπωσης string	
