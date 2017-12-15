@@ -5,143 +5,103 @@
 .data	
 	array: .word 0:10 # Δεσμεύει έναν πίνακα 10 ακεραίων, όπου όλοι είναι αρχικοποιημένοι στο 0
 	
-	# Δήλωση μηνυμάτων που θα τυπωθούν στην κονσόλα	
-	
 	space: .asciiz " " 
-	enter: .asciiz "\n" 
-
-	msg1: .asciiz "Sorted array: " 
-	msg2: .asciiz "Unsorted array: " 
+	enter: .asciiz " \n" 
 	
-	# lathos minima
-	msg3: .asciiz  "Dose ton 1o oro tis arithmitikis proodou: "
-
+	msg0: .asciiz "Unsorted array: " 
+	msg1: .asciiz "Sorted array: " 
+	msg3: .asciiz  "Dose ton "
+	msg4: .asciiz  "o arithmo: "
+	
 .text
-	# Κυρίως πρόγραμμα 
+	
 	main:	
-		la $a0, msg2 # Αποθήκευση διεύθυνσης msg2 στον καταχωρητή $a0 
-		li $v0,4     # Κλήση για εκτέλεση εκτύπωσης string	
-		syscall      # Εκτέλεση
+		la $a0,msg0
+		li $v0,4 
+		syscall 
 		
-		add $t9, $0, 100 # temporary
-		li $t3, 0       # $t3 = 0
+		li $t9, 100
+		li $s1, 0
 		
-		jal fill # temporary
+		jal fill #  Άλμα στην συνάρτηση fill
 		
-		add $t3,$0, 0		
+		add $s1,$0, 0		
 		jal print # tiposi ataksinomitou pinaka
 					
-		add $t4, $0, 40	# n = 40
-		
+		li $s2, 40	# n = 36
 		jal sort	
 		
 		continue:
 		
-			add $t3,$0, 0
+			li $s1, 0		
 			
-			la $a0,msg1
-			li $v0,4 
-			syscall 				
-									
+			la $a0,msg1 # Αποθήκευση διεύθυνσης msg1 στον καταχωρητή $a0 
+			li $v0,4    # Κλήση για εκτέλεση εκτύπωσης string	
+			syscall     # Εκτέλεση		
+			
 			jal print # tiposi ataksinomitou pinaka
 			
-			jal end
-			
-	fill2:
+			li $v0, 10  # Κλήση για έξοδο
+			syscall     # Εκτέλεση
+		
+	sort:
+		beq $s2,4,return ## if (n == 1) return;
+		
+		li $s1, 0
+		jal BubbleSortLoop
+		
+		add $t6,$s1, 0
+		add $s1,$0, 0
+		#jal print
+		add $s1,$t6, 0
+		
+		add $s2, $s2, -4
+		jal sort # bubbleSort(arr, n-4);	
+					
+		jal continue
 
-		la $t2, array($t3)
-		
-		la $a0, msg3 # Αποθήκευση διεύθυνσης msg3 στον καταχωρητή $a0 
-		li $v0, 4    # Κλήση για εκτέλεση εκτύπωσης string	
-		syscall      # Εκτέλεση
-		
-		move $a0,$t3            # Αποθήκευση της τιμής του καταχωρητή $t3 στον καταχωρητή $a0 
-		li $v0,1                # Κλήση για εκτέλεση εκτύπωσης ακεραίου
-		syscall             	# Εκτέλεση
+	BubbleSortLoop:			
+		beq $s1,$s2, return # isos na prepei na ginei s2 - 1
 	
-		sw $t9, ($t2)
-		
-		add $t9,$t9,-10		
-		
-		add $t3,$t3,4
-	
-		blt $t3, 40, fill2
-				
-		jr $ra
-							
-	sort:	
-	
-		beq $t4, 4, continue # if ( t4 == 4 ) continue;
-		
-		add $t3,$0, 0
-		jal loop
-		
-		add $t6,$t3, 0
-		add $t3,$0, 0
-
-		add $t3,$t6, 0
-		
-		add $t4, $t4, -4
-		j sort # bubbleSort(arr, n-4);	
-		
-		jr $ra # i mporei na mpei return
-
-	# buuble sort loop
-	loop:			
-		beq $t3,$t4, return # isos na prepei na ginei t4 - 1
-	
-        	lw $t2, array($t3)
+        	lw $s3, array($s1)
         	        	        	
-        	add $t3, $t3, 4 # t3 = t3 + 4        	
-        	lw $t5, array($t3)         	       	
-		add $t3, $t3, -4
+#        	add $s1, $s1, 4 # s1 = s1 + 4        	
+        	lw $s4, array + 4($s1)         	       	
+#		add $s1, $s1, -4
         	
-        	bgt $t2,$t5, swap #if (arr[i] > arr[i+1])
+        	bgt $s3,$s4, swap #if (arr[i] > arr[i+1])
         	
-        	loop_continue:      	       	          	
-	        	
-		   	add $t3, $t3, 4
-        		j loop
-            	
+        	loop_continue:       		        	          	            
+			
+		   	add $s1, $s1, 4  # s1 = s1 + 4 	
+        	
+        		j BubbleSortLoop
+            
+ 	# Ανταλλαγή θέσεων μεταξύ στοιχείων του πίνακα	
         swap:                
-        	move $t6, $t2
-        	sw $t5, array + 0($t3)
-        	sw $t6, array + 4($t3)     
+        	sw $s4, array + 0($s1)
+        	sw $s3, array + 4($s1)     
         	 
         	j loop_continue       	        			
         	            	
         return:
         	jr $ra		
-			
-	fill:
-
-		la $t2, array($t3)
-	
-		sw $t9, ($t2)
 		
-		add $t9,$t9,-10		
-		
-		add $t3,$t3,4
-	
-		blt $t3, 40, fill 
-				
-		jr $ra
-			
 	print:
 	
-		lw $t2, array($t3)
+		lw $s3, array($s1)
 	
-		move $a0,$t2 # τυπωση στοιχειου στη θεση $t3
+		move $a0,$s3 
 		li $v0,1
 		syscall
 
-		la $a0,space # afinoume keno
+		la $a0,space
 		li $v0,4 
 		syscall 
 	
-		add $t3, $t3, 4
+		add $s1, $s1, 4
 	
-		blt $t3, 40, print
+		blt $s1, 40, print
 		
 		la $a0,enter
 		li $v0,4 
@@ -149,8 +109,21 @@
 	
 		jr $ra
 	
-	end:
-		li $v0,10 
-		syscall 
 		
 	
+
+
+
+fill:
+
+		la $s3, array($s1)
+	
+		sw $t9, ($s3)
+		
+		add $t9,$t9,-10		
+		
+		add $s1,$s1,4
+	
+		blt $s1, 40, fill 
+				
+		jr $ra
