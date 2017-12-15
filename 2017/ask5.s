@@ -4,9 +4,10 @@
 
 .data	
 	array: .word 0:10 # Δεσμεύει έναν πίνακα 10 ακεραίων, όπου όλοι είναι αρχικοποιημένοι στο 0
+	#ArraySize: .word 40
 	
 	space: .asciiz " " 
-	enter: .asciiz " \n" 
+	enter: .asciiz "\n" 
 	
 	msg0: .asciiz "Unsorted array: " 
 	msg1: .asciiz "Sorted array: " 
@@ -17,19 +18,21 @@
 	
 	# Κυρίως πρόγραμμα
 	main:	
+		li $t9, 100
+		li $s0, 1	# $s0 = 1
+		li $s1, 0       # $s1 = 0
+		
+		jal fill2 #  Άλμα στην συνάρτηση fill2
+		
 		la $a0, msg0  # Αποθήκευση διεύθυνσης msg0 στον καταχωρητή $a0 
 		li $v0, 4     # Κλήση για εκτέλεση εκτύπωσης string	
 		syscall       # Εκτέλεση
 		
-		li $t9, 100
-		li $s1, 0
-		
-		jal fill #  Άλμα στην συνάρτηση fill
-		
-		add $s1,$0, 0		
+		li $s1, 0		
 		jal print # tiposi ataksinomitou pinaka
 					
-		li $s2, 40	# n = 36
+		#li $s2, ArraySize # $s2 = ArraySize
+		li $s2, 40	
 		jal sort	
 		
 		continue:
@@ -78,10 +81,10 @@
 		li $s1, 0 # $s1 = 0
 		jal BubbleSortLoop
 				
-		move $t6, $s1
-		
+		move $t6, $s1		
 		sub $s2, $s2, 4
-		jal sort # bubbleSort(arr, n-4);	
+		
+		j sort # bubbleSort(arr, n-4);	
 					
 		jal continue
 
@@ -92,7 +95,6 @@
         	lw $s3, array($s1)      # Αποθήκευση της τιμής του πίνακα στη θέση $s1 στον καταχωρητή $s3   	        	        	  	
         	lw $s4, array + 4($s1)   # Αποθήκευση της τιμής του πίνακα στη θέση $s1 + 4 στον καταχωρητή $s4
 
-        	
         	bgt $s3,$s4, swap #if (arr[i] > arr[i+1])
         	
         	loop_continue:       		        	          	            
