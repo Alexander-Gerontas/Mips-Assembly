@@ -18,7 +18,7 @@
 	Main:	
 		li $s0, 1      # $s0 = 1
 		li $s1, 0      # $s1 = 0
-		
+			
 		jal GetNumbers # Μεταφέρουμε την εκτέλεση στη συνάρτηση GetNumbers και αποθηκεύουμε τον μετρητή του προγράμματος
 				
 		la $a0, msg0   # Αποθήκευση διεύθυνσης msg0 στον καταχωρητή $a0 
@@ -73,20 +73,19 @@
 		
 	# Ταξινόμηση πίνακα με χρήση BubbleSort
 	BubbleSort:
-		beq $s2, 4, Main_Continue # if $s2 == 4 goto Main_Continue
+		beq $s5, 1, Main_Continue # if $s5 == true goto Main_Continue
 		
 		li $s1, 0                 # $s1 = 0
+		li $s5, 1		  # $s5 = true
 		jal BubbleSortLoop        # Άλμα στην συνάρτηση BubbleSortLoop
 					
-		sub $s2, $s2, 4           # $s2 = $s2 + 4
-		
+		sub $s2, $s2, 4           # $s2 = $s2 - 4		
 		j BubbleSort              # Μεταφέρουμε την εκτέλεση στη συνάρτηση BubbleSort χωρίς να αποθηκεύσουμε τον μετρητή του προγράμματος					
-		jal Main_Continue         # Άλμα στην συνάρτηση Main_Continue
 
 	# Υλοποίηση του βρόνχου "for" της BubbleSort
 	BubbleSortLoop:			
 		beq $s1,$s2, Return    # if $s1 == $s2 goto Return
-	
+				
         	lw $s3, array($s1)     # Αποθήκευση της τιμής του πίνακα στη θέση $s1 στον καταχωρητή $s3   	        	        	  	
         	lw $s4, array + 4($s1) # Αποθήκευση της τιμής του πίνακα στη θέση $s1 + 4 στον καταχωρητή $s4
 
@@ -98,7 +97,8 @@
         		j BubbleSortLoop # Άλμα στην συνάρτηση BubbleSortLoop
             
  	# Ανταλλαγή θέσεων μεταξύ στοιχείων του πίνακα	
-        Swap:                
+        Swap:         
+		li $s5, 0                 # $s5 = false
      	        sw $s3, array + 4($s1)    # $s3 = array[$s1 + 4]    
         	sw $s4, array + 0($s1)    # $s4 = array[$s1]
         	 
@@ -128,5 +128,3 @@
 		syscall            # Εκτέλεση
 	
 		jr $ra             # Έξοδος από την συνάρτηση και άλμα στον καταχωρητή $ra
-	
-		
