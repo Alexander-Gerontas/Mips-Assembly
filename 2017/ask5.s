@@ -82,7 +82,7 @@
 		sub $s2, $s2, 4           # $s2 = $s2 - 4		
 		j BubbleSort              # Μεταφέρουμε την εκτέλεση στη συνάρτηση BubbleSort χωρίς να αποθηκεύσουμε τον μετρητή του προγράμματος					
 
-	# Υλοποίηση του βρόνχου "for" της BubbleSort
+	# Υλοποίηση του βρόνχου της BubbleSort
 	BubbleSortLoop:			
 		beq $s1,$s2, Return    # if $s1 == $s2 goto Return
 				
