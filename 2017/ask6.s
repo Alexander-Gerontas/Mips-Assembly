@@ -15,30 +15,27 @@
 	msg0: .asciiz "Dose to k: "
 	msg1: .asciiz "Average temperatures per k years : "
 	
-	temp: .word 100
-	k:    .word 0
-	
-	sum: .word 0
+	k: .word 0	
 	ArrayPos: .word 0
 	loop: .word 0
 	
 .text
 
 	Main:		
-		lw $t9, temp
+		li $t9, 100
 		jal fill
 	
-		li $s1, 0      # $s1 = 0
+		li $s1, 0      # τυπωση δεν χρειαζεται
 		jal Print      # Τύπωση μη ταξινομημένου πίνακα
 	
 		jal GetNumber
 		
 		li $t0, 0
-		lw $t2, sum
+		li $t2, 0
 		
 		lw $t3, k		
 				
-		jal CalcAver
+		jal CalcAver 
 	
 		li $v0, 10   # Κλήση για έξοδο
 		syscall      # Εκτέλεση
@@ -79,7 +76,6 @@
 		mul $t5, $t3, 4
 		add $t4, $t0, $t5		
 					
-		# if t0 == k break																		# if t0 == k break				
 		blt $t4, 44, CalcAver # gt 40
 		
 		jr $ra
