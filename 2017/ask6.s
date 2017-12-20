@@ -2,9 +2,9 @@
 # Τσίπος Ιωάννης      321/2015207
 # Ζιώζας Γεώργιος     321/2015058
 
-sw $t0, var # var = $t0
+#sw $t0, var # var = $t0
 
-lw $t0, var # $t0 = var
+#lw $t0, var # $t0 = var
 
 .data	
 	array: .word 0:10 # Δεσμεύει έναν πίνακα 10 ακεραίων, όπου όλοι είναι αρχικοποιημένοι στο 0
@@ -13,14 +13,18 @@ lw $t0, var # $t0 = var
 	enter: .asciiz "\n" 
 	
 	msg0: .asciiz "Dose to k: "
+	msg1: .asciiz "Average temperatures per k years : "
 	
 	temp: .word 100
 	k:    .word 0
 	
+	sum: .word 0
+	ArrayPos: .word 0
+	loop: .word 0
+	
 .text
 
-	Main:	
-	
+	Main:		
 		lw $t9, temp
 		jal fill
 	
@@ -28,11 +32,57 @@ lw $t0, var # $t0 = var
 		jal Print      # Τύπωση μη ταξινομημένου πίνακα
 	
 		jal GetNumber
+		
+		li $t0, 0
+		lw $t2, sum
+		
+		lw $t3, k		
+				
+		jal CalcAver
 	
 		li $v0, 10   # Κλήση για έξοδο
 		syscall      # Εκτέλεση
 		
-	Calc:
+	CalcAver:
+		
+		lw $t1, array($t0) 
+		
+		add $t2, $t2, $t1
+		add $t0, $t0, 4
+						
+		mul $t4, $t3, 4
+		
+		lw $t5, ArrayPos		
+		add $t4, $t4, $t5	
+			
+		blt $t0, $t4, CalcAver # if t0 == 4*k break
+		
+		la $a0, msg1          
+		li $v0, 4               # Κλήση για εκτέλεση εκτύπωσης string	
+		syscall                 # Εκτέλεση
+		
+		div $t2, $t2, $t3
+		
+		move $a0, $t2
+		li $v0, 1          # Κλήση για εκτέλεση εκτύπωσης ακεραίου
+		syscall            # Εκτέλεση
+		
+		la $a0, enter
+		li $v0, 4               # Κλήση για εκτέλεση εκτύπωσης string	
+		syscall                 # Εκτέλεση
+		
+		li $t2, 0				
+		lw $t0, ArrayPos		
+		add $t0, $t0, 4
+		sw $t0, ArrayPos
+		
+		mul $t5, $t3, 4
+		add $t4, $t0, $t5		
+					
+		# if t0 == k break																		# if t0 == k break				
+		blt $t4, 44, CalcAver # gt 40
+		
+		jr $ra
 		
 		
 	# Είσοδος αριθμών από τον χρήστη
