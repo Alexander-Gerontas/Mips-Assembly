@@ -11,6 +11,7 @@
 	msg0: .asciiz "Dose to k: "
 	msg1: .asciiz "Average temperatures per "
 	msg2: .asciiz " years : "
+	msg3: .asciiz "K has to be between 0 and 10 \n"
 	
 	k: .word 0	
 	ArrayPos: .word 0
@@ -96,9 +97,22 @@
 		
 		li $v0,5                # Κλήση για διάβασμα ακεραίου  
 		syscall                 # Εκτέλεση	
+		
+		blez $v0,WrongMessage
+		bgt $v0, 10, WrongMessage
+		
 		sw $v0, k
 			
 		jr $ra                  # Έξοδος από την συνάρτηση και επιστροφή στον καταχωρητή $ra
+		
+	WrongMessage:
+		la $a0, msg3
+		li $v0, 4               # Κλήση για εκτέλεση εκτύπωσης string	
+		syscall                 # Εκτέλεση
+		
+		j GetNumber
+		
+		
 	
 	# Εκτυπώνει τους όρους του πίνακα στη σειρά 		
 	Print:	
