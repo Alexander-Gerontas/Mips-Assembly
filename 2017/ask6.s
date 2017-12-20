@@ -1,3 +1,30 @@
+sw $t0, var # var = $t0
+lw $t0, var # $t0 = var
+
+# $t0 : array possition
+# $t1 : array[i]
+  $t2 : sum
+# $t3 : k
+# $t4 : just a temp
+# $t5 : another temp
+# $t9 : var for filling array
+
+a. dn dinoume times me orismata $a0
+c. 
+d. tiposi me kena oxi me enter
+e. dn tiponi ipodiastoli
+
+1
+2
+3
+
+1
+2.
+3
+4.
+5
+6.
+
 # Γέροντας Αλέξανδρος 321/2015029
 # Τσίπος Ιωάννης      321/2015207
 # Ζιώζας Γεώργιος     321/2015058
@@ -6,7 +33,7 @@
 	array: .word 0:10 # Δεσμεύει έναν πίνακα 10 ακεραίων, όπου όλοι είναι αρχικοποιημένοι στο 0
 	
 	space: .asciiz " " 
-	enter: .asciiz "\n" 
+	enter: .asciiz "\n" ######################3
 	
 	msg0: .asciiz "Dose to k: "
 	msg1: .asciiz "Average temperatures per "
@@ -30,7 +57,19 @@
 		li $t2, 0
 		
 		lw $t3, k		
-				
+		
+		la $a0, msg1          
+		li $v0, 4               # Κλήση για εκτέλεση εκτύπωσης string	
+		syscall                 # Εκτέλεση
+		
+		move $a0, $t3
+		li $v0, 1          # Κλήση για εκτέλεση εκτύπωσης ακεραίου
+		syscall            # Εκτέλεση
+	
+		la $a0, msg2
+		li $v0, 4 # Κλήση για εκτέλεση εκτύπωσης string	
+		syscall # Εκτέλεση
+										
 		jal CalcAver 
 	
 		li $v0, 10   # Κλήση για έξοδο
@@ -47,32 +86,20 @@
 		add $t4, $t4, $t5	
 			
 		blt $t0, $t4, CalcAver # if t0 == 4*k break
-		
-		la $a0, msg1          
-		li $v0, 4               # Κλήση για εκτέλεση εκτύπωσης string	
-		syscall                 # Εκτέλεση
-		
-		move $a0, $t3
-		li $v0, 1          # Κλήση για εκτέλεση εκτύπωσης ακεραίου
-		syscall            # Εκτέλεση
-		
-		la $a0, msg2
-		li $v0, 4 # Κλήση για εκτέλεση εκτύπωσης string	
-		syscall # Εκτέλεση
-		
+				
 		mtc1 $t2, $f0
 		cvt.s.w $f0, $f0
 		
 		mtc1 $t3, $f1
 		cvt.s.w $f1, $f1
 		
-		div.s $f0, $f0, $f1
+		div.s $f0, $f0, $f1				
 		
 		mov.s $f12, $f0	
 		li $v0, 2 # Κλήση για εκτέλεση εκτύπωσης float           
 		syscall # Εκτέλεση
 		
-		la $a0, enter
+		la $a0, space
 		li $v0, 4 # Κλήση για εκτέλεση εκτύπωσης string	
 		syscall # Εκτέλεση
 		
@@ -147,7 +174,7 @@ fill:
 		
 		add $t9,$t9,-10		
 		
-		add $s1,$s1,4
+		add $s1, $s1, 4
 	
 		blt $s1, 40, fill 
 				
