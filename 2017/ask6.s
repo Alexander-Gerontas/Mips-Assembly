@@ -2,102 +2,151 @@
 # Τσίπος Ιωάννης      321/2015207
 # Ζιώζας Γεώργιος     321/2015058
 
-#sw $t0, var # var = $t0
-
-#lw $t0, var # $t0 = var
-
 .data	
 	array: .word 0:10 # Δεσμεύει έναν πίνακα 10 ακεραίων, όπου όλοι είναι αρχικοποιημένοι στο 0
 	
-	space: .asciiz " " 
-	enter: .asciiz "\n" 
+	space: .asciiz " "  ######################
+	enter: .asciiz "\n" ######################
 	
-	msg0: .asciiz "Dose to k: "
-	msg1: .asciiz "Average temperatures per k years : "
+	msg0: .asciiz "Give temperature "
+	msg1: .asciiz ": "
+	msg2: .asciiz "Dose to k: "
+	msg3: .asciiz "K has to be between 0 and 10 \n"
+	msg4: .asciiz "Average temperatures per "
+	msg5: .asciiz " years: \n"
 	
-	k: .word 0	
-	ArrayPos: .word 0
-	loop: .word 0
+	k: .word 0
+	ArrayPos: .word 0 ##############
+	endpos: .word 0
 	
 .text
-
-	Main:		
-		li $t9, 100
+	Main:			
+		li $t0, 0		
+		li $t1, 1
+		
+		#jal GetNumbers
 		jal fill
-	
-		li $s1, 0      # τυπωση δεν χρειαζεται
-		jal Print      # Τύπωση μη ταξινομημένου πίνακα
-	
-		jal GetNumber
 		
-		li $t0, 0
-		li $t2, 0
+		li $t0, 0 ######			
+		jal Print ######
 		
-		lw $t3, k		
-				
-		jal CalcAver 
-	
-		li $v0, 10   # Κλήση για έξοδο
-		syscall      # Εκτέλεση
-		
-	CalcAver:
-		
-		lw $t1, array($t0) 
-		
-		add $t2, $t2, $t1
-		add $t0, $t0, 4
+		jal GetNumber	
+		lw $a1, k
 						
-		mul $t4, $t3, 4
-		
-		lw $t5, ArrayPos		
-		add $t4, $t4, $t5	
-			
-		blt $t0, $t4, CalcAver # if t0 == 4*k break
-		
-		la $a0, msg1          
+		la $a0, msg4          
 		li $v0, 4               # Κλήση για εκτέλεση εκτύπωσης string	
 		syscall                 # Εκτέλεση
 		
-		div $t2, $t2, $t3
-		
-		move $a0, $t2
+		lw $a0, k	
 		li $v0, 1          # Κλήση για εκτέλεση εκτύπωσης ακεραίου
 		syscall            # Εκτέλεση
+	
+		la $a0, msg5
+		li $v0, 4 # Κλήση για εκτέλεση εκτύπωσης string	
+		syscall # Εκτέλεση		
+													 
+		func:
+			li $t2, 0
+			lw $a0, ArrayPos
+			jal CalcAver 	
+						
+			mov.s $f12, $f0	
+			li $v0, 2 # Κλήση για εκτέλεση εκτύπωσης float           
+			syscall # Εκτέλεση
 		
-		la $a0, enter
-		li $v0, 4               # Κλήση για εκτέλεση εκτύπωσης string	
-		syscall                 # Εκτέλεση
+			la $a0, space
+			li $v0, 4 # Κλήση για εκτέλεση εκτύπωσης string	
+			syscall # Εκτέλεση
+												
+			lw $s4, endpos			
+			
+			blt $s4, 40, func			
 		
-		li $t2, 0				
+		li $v0, 10   # Κλήση για έξοδο
+		syscall      # Εκτέλεση
+	
+	CalcAver:
+		lw $t1, array($a0) 
+		
+		add $t2, $t2, $t1
+		add $a0, $a0, 4
+						
+		mul $t4, $a1, 4		
+		lw $t5, ArrayPos
+		add $t4, $t4, $t5
+			
+		blt $a0, $t4, CalcAver # if t0 == 4*k break
+		
+		sw $a0, endpos
+		
 		lw $t0, ArrayPos		
 		add $t0, $t0, 4
 		sw $t0, ArrayPos
+				
+		mtc1 $t2, $f0
+		cvt.s.w $f0, $f0
 		
-		mul $t5, $t3, 4
-		add $t4, $t0, $t5		
-					
-		blt $t4, 44, CalcAver # gt 40
+		mtc1 $a1, $f1
+		cvt.s.w $f1, $f1
 		
+		div.s $f0, $f0, $f1			
+			
 		jr $ra
 		
-		
 	# Είσοδος αριθμών από τον χρήστη
-	GetNumber:	
-		la $a0, msg0            # Αποθήκευση διεύθυνσης msg0 στον καταχωρητή $a0 
+	GetNumbers:
+		la $t2, array($t0)
+		
+		la $a0, msg0
+		li $v0, 4               # Κλήση για εκτέλεση εκτύπωσης string	
+		syscall                 # Εκτέλεση
+		
+		move $a0, $t1           
+		li $v0, 1               # Κλήση για εκτέλεση εκτύπωσης ακεραίου
+		syscall                 # Εκτέλεση
+		
+		la $a0, msg1
 		li $v0, 4               # Κλήση για εκτέλεση εκτύπωσης string	
 		syscall                 # Εκτέλεση
 		
 		li $v0,5                # Κλήση για διάβασμα ακεραίου  
 		syscall                 # Εκτέλεση	
+		sw $v0, ($t2)          
+			
+		add $t1, $t1, 1
+		add $t0, $t0, 4         
+	
+		blt $t0, 40, GetNumbers 
+				
+		jr $ra                  # Έξοδος από την συνάρτηση και επιστροφή στον καταχωρητή $ra
+
+	GetNumber:	
+		la $a0, msg2
+		li $v0, 4               # Κλήση για εκτέλεση εκτύπωσης string	
+		syscall                 # Εκτέλεση
+		
+		li $v0,5                # Κλήση για διάβασμα ακεραίου  
+		syscall                 # Εκτέλεση	
+		
+		blez $v0, WrongMessage
+		bgt $v0, 9, WrongMessage
+		
 		sw $v0, k
 			
 		jr $ra                  # Έξοδος από την συνάρτηση και επιστροφή στον καταχωρητή $ra
-	
-	# Εκτυπώνει τους όρους του πίνακα στη σειρά 		
+		
+	WrongMessage:
+		la $a0, msg3
+		li $v0, 4               # Κλήση για εκτέλεση εκτύπωσης string	
+		syscall                 # Εκτέλεση
+		
+		j GetNumber
+
+	##############
 	Print:	
-		lw $s3, array($s1) # Αποθήκευση της τιμής του πίνακα στη θέση $s1 στον καταχωρητή $s3
+		lw $t2, array($t0) 
 	
-		move $a0, $s3      # Αποθήκευση της τιμής του καταχωρητή $s3 στον καταχωρητή $a0 
+		move $a0, $t2      
 		li $v0, 1          # Κλήση για εκτέλεση εκτύπωσης ακεραίου
 		syscall            # Εκτέλεση
 
@@ -105,29 +154,99 @@
 		li $v0, 4          # Κλήση για εκτέλεση εκτύπωσης string
 		syscall            # Εκτέλεση
 	
-		add $s1, $s1, 4	   # $s1 = s1 + 4
-		blt $s1, 40, Print # if $s1 < 40 goto Print
+		add $t0, $t0, 4	   
+		blt $t0, 40, Print 
 		
 		la $a0, enter      # Αποθήκευση διεύθυνσης enter στον καταχωρητή $a0
 		li $v0, 4          # Κλήση για εκτέλεση εκτύπωσης string	
 		syscall            # Εκτέλεση
 	
 		jr $ra             # Έξοδος από την συνάρτηση και άλμα στον καταχωρητή $ra
-	
-	
-
-
-# γεμισμα του πινακα με δικες μου τιμες						
-fill:
-
-		la $s3, array($s1)
-	
-		sw $t9, ($s3)
 		
-		add $t9,$t9,-10		
+
+	#################					
+	fill:
+
+		la $t2, array($t0)
 		
-		add $s1,$s1,4
+		li $t9, 51
 	
-		blt $s1, 40, fill 
-				
-		jr $ra
+		sw $t9, ($t2)			
+		
+		add $t0, $t0, 4
+		
+		la $t2, array($t0)
+		
+		li $t9, 95
+	
+		sw $t9, ($t2)			
+		
+		add $t0, $t0, 4
+		
+		la $t2, array($t0)
+		
+		li $t9, 88
+	
+		sw $t9, ($t2)			
+		
+		add $t0, $t0, 4
+		
+		la $t2, array($t0)
+		
+		li $t9, 40
+	
+		sw $t9, ($t2)			
+		
+		add $t0, $t0, 4
+		
+		la $t2, array($t0)
+		
+		li $t9, 33
+	
+		sw $t9, ($t2)			
+		
+		add $t0, $t0, 4
+		
+		la $t2, array($t0)
+		
+		li $t9, 45
+	
+		sw $t9, ($t2)			
+		
+		add $t0, $t0, 4
+		
+		la $t2, array($t0)
+		
+		li $t9, 51
+	
+		sw $t9, ($t2)			
+		
+		add $t0, $t0, 4
+		
+		la $t2, array($t0)
+		
+		li $t9, 61
+	
+		sw $t9, ($t2)			
+		
+		add $t0, $t0, 4
+		
+		la $t2, array($t0)
+		
+		li $t9, 51
+	
+		sw $t9, ($t2)			
+		
+		add $t0, $t0, 4
+		
+		la $t2, array($t0)
+		
+		li $t9, 51
+	
+		sw $t9, ($t2)			
+		
+		add $t0, $t0, 4
+		
+		jr $ra		
+		
+	
