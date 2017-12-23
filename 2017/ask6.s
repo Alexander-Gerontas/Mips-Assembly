@@ -68,11 +68,11 @@
 		add $s1, $s1, $t0                # $s1 = $s1 + $t0
 		add $a0, $a0, 4                  # $a0 = $a0 + 4
 						
-		mul $t4, $a1, 4	                 # $t4 = $a1 * 4	
-		lw $t5, ArrayPos                 # $t5 = ArrayPos
-		add $t4, $t4, $t5                # $t4 = $t4 + $t5
+		mul $t2, $a1, 4	                 # $t2 = $a1 * 4	
+		lw $t3, ArrayPos                 # $t3 = ArrayPos
+		add $t2, $t2, $t3                # $t2 = $t2 + $t3
 			
-		blt $a0, $t4, CalculateMovingSum # if $a0 < $t4 goto CalculateMovingSum
+		blt $a0, $t2, CalculateMovingSum # if $a0 < $t2 goto CalculateMovingSum
 		
 		sw $a0, EndPos                   # EndPos = $a0
 		
@@ -92,7 +92,7 @@
 		
 	# Είσοδος θερμοκρασιών από τον χρήστη
 	GetTemperatures:
-		la $t1, array($s0)           # Αποθήκευση της διεύθυνσης του στοιχειού στην θέση $t0 του πίνακα στον καταχωρητή $t1
+		la $t1, array($s0)           # Αποθήκευση της διεύθυνσης του στοιχειού στην θέση $s0 του πίνακα στον καταχωρητή $t1
 		
 		la $a0, msg0                 # Αποθήκευση διεύθυνσης msg0 στον καταχωρητή $a0 
 		li $v0, 4                    # Κλήση για εκτέλεση εκτύπωσης string	
@@ -121,19 +121,19 @@
 		
 	# Είσοδος πλήθους των θερμοκρασιών από τον χρήστη
 	GetNumberOfYears:	
-		la $a0, msg2             # Αποθήκευση διεύθυνσης msg2 στον καταχωρητή $a0 
-		li $v0, 4                # Κλήση για εκτέλεση εκτύπωσης string	
-		syscall                  # Εκτέλεση
+		la $a0, msg2              # Αποθήκευση διεύθυνσης msg2 στον καταχωρητή $a0 
+		li $v0, 4                 # Κλήση για εκτέλεση εκτύπωσης string	
+		syscall                   # Εκτέλεση
 		
-		li $v0,5                 # Κλήση για διάβασμα ακεραίου  
-		syscall                  # Εκτέλεση	
+		li $v0, 5                 # Κλήση για διάβασμα ακεραίου  
+		syscall                   # Εκτέλεση	
 		
-		blez $v0, WrongMessage   # if $v0 <= 0 goto WrongMessage
-		bgt $v0, 9, WrongMessage # if $v0 > 9 goto WrongMessage
+		blez $v0, WrongMessage    # if $v0 <= 0 goto WrongMessage
+		bgt $v0, 9, WrongMessage  # if $v0 > 9 goto WrongMessage
 		
-		sw $v0, k                # k = $v0
+		sw $v0, k                 # k = $v0
 			
-		jr $ra                   # Έξοδος από την συνάρτηση και επιστροφή στον καταχωρητή $ra
+		jr $ra                    # Έξοδος από την συνάρτηση και επιστροφή στον καταχωρητή $ra
 		
 	# Σε περίπτωση οπου ο χρήστης δώσει k < 0 ή k > 9 τυπώνεται κατάλληλο μήνυμα στην οθόνη και το πρόγραμμα επιστρέφει στην συνάρτηση GetNumberOfYears
 	WrongMessage:
