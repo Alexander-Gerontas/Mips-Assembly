@@ -22,7 +22,7 @@
 .text
 	# Κυρίως πρόγραμμα
 	Main:			
-		li $t0, 0            # $t0 = 0		
+		li $s0, 0            # $s0 = 0		
 				
 		jal GetTemperatures  # Άλμα στην συνάρτηση GetTemperatures			
 		jal GetNumberOfYears # Άλμα στην συνάρτηση GetNumberOfYears
@@ -72,7 +72,7 @@
 		lw $t5, ArrayPos                 # $t5 = ArrayPos
 		add $t4, $t4, $t5                # $t4 = $t4 + $t5
 			
-		blt $a0, $t4, CalculateMovingSum # if t0 == 4*k break
+		blt $a0, $t4, CalculateMovingSum # if $a0 < $t4 goto CalculateMovingSum
 		
 		sw $a0, EndPos                   # EndPos = $a0
 		
@@ -92,7 +92,7 @@
 		
 	# Είσοδος θερμοκρασιών από τον χρήστη
 	GetTemperatures:
-		la $t1, array($t0)           # Αποθήκευση της διεύθυνσης του στοιχειού στην θέση $t0 του πίνακα στον καταχωρητή $t1
+		la $t1, array($s0)           # Αποθήκευση της διεύθυνσης του στοιχειού στην θέση $t0 του πίνακα στον καταχωρητή $t1
 		
 		la $a0, msg0                 # Αποθήκευση διεύθυνσης msg0 στον καταχωρητή $a0 
 		li $v0, 4                    # Κλήση για εκτέλεση εκτύπωσης string	
@@ -113,9 +113,9 @@
 		syscall                      # Εκτέλεση	
 		sw $v0, ($t1)                # Το στοιχείο του πίνακα στην θέση $t1 παίρνει την τιμή του καταχωρητή $v0
 			
-		add $t0, $t0, 4              # $t0 = $t0 + 4      
+		add $s0, $s0, 4              # $s0 = $s0 + 4      
 	
-		blt $t0, 40, GetTemperatures # if $t0 < 40 goto GetTemperatures
+		blt $s0, 40, GetTemperatures # if $s0 < 40 goto GetTemperatures
 				
 		jr $ra                       # Έξοδος από την συνάρτηση και επιστροφή στον καταχωρητή $ra
 		
